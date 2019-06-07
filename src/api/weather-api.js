@@ -52,3 +52,29 @@ export function getFiveDayForecastByZip(zip, units) {
       return "Invalid Search";
     });
 }
+
+export function getCurrentWeatherByCoordinates(lat, long, units) {
+  return axios
+    .get(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&appid=${apiKey}&units=${units}`
+    )
+    .then(response => {
+      return response;
+    })
+    .catch(error => {
+      return "Invalid Search";
+    });
+}
+
+export function getFiveDayForecastByCoordinates(lat, long, units) {
+  return axios
+    .get(
+      `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${long}&appid=${apiKey}&units=${units}`
+    )
+    .then(response => {
+      return response;
+    })
+    .catch(error => {
+      return "Invalid Search";
+    });
+}

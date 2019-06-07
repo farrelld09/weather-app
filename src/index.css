@@ -5,6 +5,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* background-image: url(http://i.imgur.com/fJ1fizf.gif);
+  background-repeat: no-repeat; */
 }
 
 code {

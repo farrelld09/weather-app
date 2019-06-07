@@ -1,13 +1,13 @@
 import React from "react";
 import {
-  getWeatherByZip,
-  getWeatherByCity,
   getCurrentWeatherByCity,
   getFiveDayForecastByZip,
   getCurrentWeatherByZip,
-  getFiveDayForecastByCity
+  getFiveDayForecastByCity,
+  getCurrentWeatherByCoordinates,
+  getFiveDayForecastByCoordinates
 } from "../api/weather-api";
-import { currentWeather, CurrentWeather } from "./current-weather";
+import { CurrentWeather } from "./current-weather";
 import { FiveDayForecast } from "./five-day-forecast";
 
 export class SearchPanel extends React.Component {
@@ -19,6 +19,10 @@ export class SearchPanel extends React.Component {
       fiveDayWeather: [],
       units: "imperial"
     };
+  }
+
+  componentDidMount() {
+    navigator.geolocation.getCurrentPosition(this.getCurrentLocation);
   }
 
   getWeatherByZip = async () => {
@@ -35,7 +39,6 @@ export class SearchPanel extends React.Component {
   getWeatherByCity = async () => {
     const city = document.getElementById("city").value;
     document.getElementById("zip").value = "";
-    console.log("city", city);
     const currentWeather = await getCurrentWeatherByCity(
       city,
       this.state.units
@@ -60,12 +63,31 @@ export class SearchPanel extends React.Component {
   toggleUnits = () => {
     const { units } = this.state;
     this.setState({
-      units: units === "imperial" ? "fiveday" : "imperial"
+      units: units === "imperial" ? "metric" : "imperial"
     });
   };
 
+  getCurrentLocation = async position => {
+    const answer = window.confirm("Get weather for your current location?");
+    if (answer) {
+      const currentWeather = await getCurrentWeatherByCoordinates(
+        position.coords.latitude,
+        position.coords.longitude,
+        this.state.units
+      );
+      const fiveDayWeather = await getFiveDayForecastByCoordinates(
+        position.coords.latitude,
+        position.coords.longitude,
+        this.state.units
+      );
+      this.setState({
+        currentWeather: currentWeather,
+        fiveDayWeather: fiveDayWeather
+      });
+    }
+  };
+
   render() {
-    console.log(this.state);
     let perspective =
       this.state.perspective === "current" ? (
         <CurrentWeather weather={this.state.currentWeather} />
@@ -74,75 +96,95 @@ export class SearchPanel extends React.Component {
       );
 
     return (
-      <div className="container">
+      <div
+        className="container"
+        style={{
+          position: "relative",
+          backgroundColor: "#F3F3F3",
+          marginTop: "1em"
+        }}
+      >
         <div className="row">
-          <div className="col-lg">
-            <h1>Weather App</h1>
+          <div className="col-12">
+            <h1 className="mx-auto title">Weather App</h1>
           </div>
         </div>
         <div className="row">
-          <div className="col-3">
+          <div className="col-8 btn-group" role="group">
             <button
-              onClick={this.toggleForecast}
-              style={
+              className={
                 this.state.perspective === "current"
-                  ? { backgroundColor: "yellow" }
-                  : {}
+                  ? "btn btn-primary btn-lg weather-mode"
+                  : "btn btn-outline-primary btn-lg weather-mode"
               }
+              onClick={this.toggleForecast}
             >
               Today's Current Weather
             </button>
-            <br />
             <button
+              type="button"
+              className={
+                this.state.perspective !== "current"
+                  ? "btn btn-primary btn-lg weather-mode"
+                  : "btn btn-outline-primary btn-lg weather-mode"
+              }
+              onClick={this.toggleForecast}
+            >
+              Five Day Forecast
+            </button>
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col-8 btn-group">
+            <button
+              type="button"
               onClick={this.toggleUnits}
-              style={
+              className={
                 this.state.units === "imperial"
-                  ? { backgroundColor: "yellow" }
-                  : {}
+                  ? "btn btn-primary btn-lg weather-mode"
+                  : "btn btn-outline-primary btn-lg weather-mode"
               }
             >
               Fahrenheit
             </button>
-          </div>
-          <div className="col-3">
             <button
-              onClick={this.toggleForecast}
-              style={
-                this.state.perspective !== "current"
-                  ? { backgroundColor: "yellow" }
-                  : {}
-              }
-            >
-              Five Day Forecast
-            </button>
-            <br />
-            <button
+              type="button"
               onClick={this.toggleUnits}
-              style={
+              className={
                 this.state.units !== "imperial"
-                  ? { backgroundColor: "yellow" }
-                  : {}
+                  ? "btn btn-primary btn-lg weather-mode"
+                  : "btn btn-outline-primary btn-lg weather-mode"
               }
             >
-              Celcius
+              Celsius
             </button>
           </div>
         </div>
         <div className="row">
-          <div className="col-lg">
-            <h6>Zip Code</h6>
-            <input type="text" id="zip" />
+          <div className="col-4">
+            <label for="zip">Zip Code</label>
+            <br />
+            <input type="text" id="zip" style={{ height: "2em" }} />
             <button
+              style={{ height: "2.4em", marginLeft: "1em" }}
+              className="btn btn-primary btn-sm"
               onClick={this.getWeatherByZip}
-              onFocus={() => (this.value = "")}
             >
-              Search by Zip Code
+              Search
             </button>
           </div>
-          <div className="col-lg">
-            <h6>City Name</h6>
-            <input type="text" id="city" />
-            <button onClick={this.getWeatherByCity}>Search by City Name</button>
+          <div className="col-4">
+            <label for="city">City</label>
+            <br />
+            <input type="text" id="city" style={{ height: "2em" }} />
+            <button
+              style={{ height: "2.4em", marginLeft: "1em" }}
+              className="btn btn-primary btn-sm"
+              onClick={this.getWeatherByCity}
+            >
+              Search
+            </button>
           </div>
         </div>
         <div className="row">

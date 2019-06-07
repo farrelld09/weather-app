@@ -3,7 +3,6 @@ import moment from "moment";
 import { daysOfTheWeek } from "./constants";
 
 export const FiveDayForecast = props => {
-  console.log("props", props);
   const weather = props.weather.data;
   if (weather) {
     const fiveDayForecast = weather.list.filter((day, i) => {
@@ -14,11 +13,11 @@ export const FiveDayForecast = props => {
     const mapDaysToHTML = fiveDayForecast.map(day => {
       const dayOfWeek = moment(day.dt_txt).day();
       return (
-        <div className="card col-md-4 col-lg-4" key={day.dt}>
+        <div className="card col-2" key={day.dt}>
           <div className="card-body" id="stat-line">
-            <span>{`${daysOfTheWeek[dayOfWeek]}'s Forecast`}</span>
+            <span id="day">{`${daysOfTheWeek[dayOfWeek]}'s Forecast`}</span>
             <br />
-            <span>Temp: {day.main.temp}</span>
+            <span>City: {weather.city.name}</span>
             <br />
             <span>High: {day.main.temp_max}</span>
             <br />
@@ -30,7 +29,6 @@ export const FiveDayForecast = props => {
         </div>
       );
     });
-    console.log("fiveDayForecast", fiveDayForecast);
     return (
       <>
         <h3>Five Day Forecast (between 6pm and 9pm)</h3>
@@ -39,9 +37,9 @@ export const FiveDayForecast = props => {
     );
   }
   return (
-    <div>
-      <span>Five Day Forecast</span>
-      <span>{props.weather == [] ? "" : props.weather}</span>
+    <div style={{ margin: "1em" }}>
+      <h3>Five Day Forecast</h3>
+      <span>{props.weather === [] ? "" : props.weather}</span>
     </div>
   );
 };
